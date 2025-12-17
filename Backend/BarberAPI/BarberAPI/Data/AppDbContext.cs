@@ -7,28 +7,13 @@ namespace BarberAPI.Data
 {
     public class AppDbContext : DbContext
     {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
         public DbSet<AppUser> Users { get; set; }      // Ortak havuz
         public DbSet<Barber> Barbers { get; set; }     // Hizmet verenler
         public DbSet<Customer> Customers { get; set; } // Hizmet alanlar
         public DbSet<BarberServiceArea> BarberServiceAreas { get; set; } // Berberin hizmet verdiği bölgeler
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json")
-                    .Build();
-
-                var connectionString = configuration.GetConnectionString("Default");
-
-                optionsBuilder
-                    .UseNpgsql(connectionString)
-                    .LogTo(Console.WriteLine, LogLevel.Information) // Logları konsola bas
-                    .EnableSensitiveDataLogging(); // Hata anındaki veriyi göster (Geliştirme aşamasında kullanılır)
-            }
-        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -51,6 +36,11 @@ namespace BarberAPI.Data
                 .WithOne(sa => sa.Barber)
                 .HasForeignKey(sa => sa.BarberId)
                 .OnDelete(DeleteBehavior.Cascade); // ÖNEMLİ: Berber silinirse bölgeleri de sil!
+
+            // Email alanı benzersiz olsun!
+            builder.Entity<AppUser>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }

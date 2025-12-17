@@ -7,10 +7,15 @@ namespace BarberAPI.Models.Concrete
     {
         public int Id { get; set; }
         public string Email { get; set; }
-        public string PasswordHash { get; set; } // Şifreyi asla düz metin saklama!
-        public string Role { get; set; } // "Barber", "Customer"
+        public bool IsEmailVerified { get; set; } = false; 
+        public string? EmailVerificationCode { get; set; }
 
-        // İlişki (Opsiyonel ama iyi olur)
+        // Kodun Son Geçerlilik Tarihi
+        public DateTime? EmailVerificationCodeExpiration { get; set; }
+        public string? PasswordHash { get; set; } // Şifreyi asla düz metin saklama!
+        public string Role { get; set; } // "Barber", "Customer"
+        public string? GoogleId { get; set; }
+        public bool IsProfileCompleted { get; set; } = false;
         public Barber BarberProfile { get; set; }
         public Customer CustomerProfile { get; set; }
     }
